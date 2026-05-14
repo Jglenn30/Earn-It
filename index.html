@@ -157,6 +157,26 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;max-
 .pc-targets{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;}
 .pc-target{background:rgba(74,144,217,0.1);border:1px solid rgba(74,144,217,0.2);border-radius:7px;padding:4px 10px;font-size:11px;font-weight:800;color:var(--blue);}
 .body-entry{background:var(--card);border-radius:12px;border:1px solid var(--border2);padding:12px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;}
+.body-entry-full{background:var(--card);border-radius:12px;border:1px solid var(--border2);padding:13px 14px;margin-bottom:8px;}
+
+/* CHARTS */
+.chart-tabs{display:flex;gap:6px;margin-bottom:10px;}
+.ctab{flex:1;background:var(--card);border:1px solid var(--border2);color:var(--muted);padding:8px 4px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all 0.2s;}
+.ctab.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+.chart-card{background:var(--card);border-radius:14px;border:1px solid var(--border2);padding:14px;margin-bottom:14px;}
+.chart-title{font-size:12px;font-weight:900;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+.chart-wrap{position:relative;width:100%;height:200px;}
+.chart-wrap canvas{width:100%!important;height:200px!important;}
+.chart-empty{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;font-size:12px;color:var(--muted);font-weight:700;width:80%;display:none;}
+.chart-legend{display:flex;justify-content:space-between;margin-top:10px;padding:0 4px;}
+.cl-item{text-align:center;}
+.cl-val{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--blue);line-height:1;}
+.cl-lbl{font-size:10px;color:var(--muted);font-weight:700;margin-top:1px;}
+.be-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.be-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:4px;}
+.be-row{display:flex;justify-content:space-between;align-items:center;background:var(--bg2);border-radius:7px;padding:5px 9px;}
+.be-row span:first-child{font-size:11px;color:var(--muted);font-weight:700;}
+.be-row span:last-child{font-size:12px;color:#fff;font-weight:800;}
 .be-date{font-size:11px;font-weight:700;color:var(--muted);}
 .be-weight{font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;}
 .be-detail{font-size:11px;color:var(--muted);font-weight:600;text-align:right;margin-top:1px;}
@@ -252,15 +272,58 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;max-
   </div>
   <div class="sec-label">Program Phases</div>
   <div id="phaseCards"></div>
+
+  <div class="sec-label">Progress Charts</div>
+  <div class="chart-tabs">
+    <button class="ctab active" onclick="switchChart('weight',this)">Weight</button>
+    <button class="ctab" onclick="switchChart('fat',this)">Body Fat</button>
+    <button class="ctab" onclick="switchChart('muscle',this)">Muscle</button>
+    <button class="ctab" onclick="switchChart('bmi',this)">BMI</button>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title" id="chartTitle">Weight (lbs)</div>
+    <div class="chart-wrap">
+      <canvas id="progressChart" width="360" height="200"></canvas>
+      <div class="chart-empty" id="chartEmpty">Log at least 2 weigh-ins to see your trend</div>
+    </div>
+    <div class="chart-legend" id="chartLegend"></div>
+  </div>
+
   <div class="sec-label">Body Measurements</div>
+  <div style="background:#1e2840;border:1px solid rgba(232,184,75,0.3);border-left:3px solid var(--gold);border-radius:12px;padding:12px 15px;margin-bottom:12px;">
+    <div style="font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">&#128197; Weigh-In Reminder</div>
+    <div style="font-size:13px;color:var(--text2);font-weight:700;line-height:1.5;">Log every <strong style="color:#fff;">Monday morning</strong> — first thing when you wake up, before eating or drinking. Same time every week for accurate tracking. Full performance check every 4 weeks at the end of each phase.</div>
+  </div>
   <div class="log-card">
+    <div style="font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Scale Measurements</div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Weight (lbs)</label><input class="form-input" id="bWt" type="number" placeholder="185"/></div>
       <div class="form-group"><label class="form-label">Body Fat %</label><input class="form-input" id="bFat" type="number" placeholder="20"/></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Muscle (lbs)</label><input class="form-input" id="bMuscle" type="number" placeholder="145"/></div>
-      <div class="form-group"><label class="form-label">Other</label><input class="form-input" id="bOther" placeholder="Waist: 34in"/></div>
+      <div class="form-group"><label class="form-label">Muscle Mass (lbs)</label><input class="form-input" id="bMuscle" type="number" placeholder="145"/></div>
+      <div class="form-group"><label class="form-label">BMI</label><input class="form-input" id="bBMI" type="number" placeholder="24.5"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">BMR (calories)</label><input class="form-input" id="bBMR" type="number" placeholder="1800"/></div>
+      <div class="form-group"><label class="form-label">Fat Free Weight (lbs)</label><input class="form-input" id="bFFW" type="number" placeholder="150"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Visceral Fat</label><input class="form-input" id="bVF" type="number" placeholder="8"/></div>
+      <div class="form-group"><label class="form-label">Body Water %</label><input class="form-input" id="bBW" type="number" placeholder="55"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Bone Mass (lbs)</label><input class="form-input" id="bBone" type="number" placeholder="6.5"/></div>
+      <div class="form-group"><label class="form-label">Waist (in)</label><input class="form-input" id="bWaist" type="number" placeholder="34"/></div>
+    </div>
+    <div style="font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin:14px 0 10px;">Performance (Every 4 Weeks)</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Max Push-Ups</label><input class="form-input" id="bPushups" type="number" placeholder="0"/></div>
+      <div class="form-group"><label class="form-label">Max Hang (sec)</label><input class="form-input" id="bHang" type="number" placeholder="0"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Max Pull-Ups</label><input class="form-input" id="bPullups" type="number" placeholder="0"/></div>
+      <div class="form-group"><label class="form-label">Back Feel (1-10)</label><input class="form-input" id="bBack" type="number" placeholder="7" min="1" max="10"/></div>
     </div>
     <button class="save-btn" onclick="saveBody()">LOG MEASUREMENTS</button>
   </div>
@@ -502,20 +565,51 @@ function renderLogEntries(){
 function saveBody(){
   var w=document.getElementById('bWt').value;var f=document.getElementById('bFat').value;
   if(!w&&!f){alert('Enter at least your weight');return;}
-  state.bodyLogs.unshift({date:new Date().toLocaleDateString(),weight:w,fat:f,
-    muscle:document.getElementById('bMuscle').value,other:document.getElementById('bOther').value});
+  state.bodyLogs.unshift({date:new Date().toLocaleDateString(),
+    weight:w, fat:f,
+    muscle:document.getElementById('bMuscle').value,
+    bmi:document.getElementById('bBMI').value,
+    bmr:document.getElementById('bBMR').value,
+    ffw:document.getElementById('bFFW').value,
+    vf:document.getElementById('bVF').value,
+    bw:document.getElementById('bBW').value,
+    bone:document.getElementById('bBone').value,
+    waist:document.getElementById('bWaist').value,
+    pushups:document.getElementById('bPushups').value,
+    hang:document.getElementById('bHang').value,
+    pullups:document.getElementById('bPullups').value,
+    back:document.getElementById('bBack').value
+  });
   saveState();renderBodyEntries();
-  ['bWt','bFat','bMuscle','bOther'].forEach(function(id){document.getElementById(id).value='';});
+  ['bWt','bFat','bMuscle','bBMI','bBMR','bFFW','bVF','bBW','bBone','bWaist','bPushups','bHang','bPullups','bBack'].forEach(function(id){document.getElementById(id).value='';});
+  setTimeout(function(){ drawChart(currentChartKey); }, 50);
 }
 
 function renderBodyEntries(){
   var el=document.getElementById('bodyEntries');
   if(!state.bodyLogs.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">&#128202;</div>Log your starting point today!</div>';return;}
   el.innerHTML=state.bodyLogs.slice(0,10).map(function(e){
-    return '<div class="body-entry"><div><div class="be-date">'+e.date+'</div>'
-      +(e.other?'<div style="font-size:11px;color:var(--muted);font-weight:600;margin-top:2px">'+e.other+'</div>':'')+'</div>'
+    var scaleRows='';
+    if(e.muscle) scaleRows+='<div class="be-row"><span>Muscle</span><span>'+e.muscle+' lbs</span></div>';
+    if(e.bmi) scaleRows+='<div class="be-row"><span>BMI</span><span>'+e.bmi+'</span></div>';
+    if(e.bmr) scaleRows+='<div class="be-row"><span>BMR</span><span>'+e.bmr+' cal</span></div>';
+    if(e.ffw) scaleRows+='<div class="be-row"><span>Fat Free Weight</span><span>'+e.ffw+' lbs</span></div>';
+    if(e.vf) scaleRows+='<div class="be-row"><span>Visceral Fat</span><span>'+e.vf+'</span></div>';
+    if(e.bw) scaleRows+='<div class="be-row"><span>Body Water</span><span>'+e.bw+'%</span></div>';
+    if(e.bone) scaleRows+='<div class="be-row"><span>Bone Mass</span><span>'+e.bone+' lbs</span></div>';
+    if(e.waist) scaleRows+='<div class="be-row"><span>Waist</span><span>'+e.waist+' in</span></div>';
+    var perfRows='';
+    if(e.pushups) perfRows+='<div class="be-row"><span>Max Push-Ups</span><span>'+e.pushups+'</span></div>';
+    if(e.hang) perfRows+='<div class="be-row"><span>Max Hang</span><span>'+e.hang+' sec</span></div>';
+    if(e.pullups) perfRows+='<div class="be-row"><span>Max Pull-Ups</span><span>'+e.pullups+'</span></div>';
+    if(e.back) perfRows+='<div class="be-row"><span>Back Feel</span><span>'+e.back+'/10</span></div>';
+    return '<div class="body-entry-full">'
+      +'<div class="be-header"><div><div class="be-date">'+e.date+'</div></div>'
       +'<div style="text-align:right"><div class="be-weight">'+e.weight+' lbs</div>'
-      +'<div class="be-detail">'+(e.fat?'BF: '+e.fat+'% ':'')+' '+(e.muscle?'· Muscle: '+e.muscle+' lbs':'')+'</div></div></div>';
+      +(e.fat?'<div class="be-detail">BF: '+e.fat+'%</div>':'')+'</div></div>'
+      +(scaleRows?'<div class="be-grid">'+scaleRows+'</div>':'')
+      +(perfRows?'<div style="font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:8px 0 5px;">Performance</div><div class="be-grid">'+perfRows+'</div>':'')
+      +'</div>';
   }).join('');
 }
 
@@ -540,6 +634,7 @@ function renderProgress(){
   document.getElementById('stS').textContent=sets;
   document.getElementById('stWk').textContent=week;
   renderPhaseCards();renderBodyEntries();
+  setTimeout(function(){ drawChart(currentChartKey); }, 50);
 }
 
 function updateHeader(){
@@ -549,6 +644,149 @@ function updateHeader(){
   document.getElementById('hdrS').textContent=sets;
   document.getElementById('hdrR').textContent=Math.round(rope);
   document.getElementById('weekChip').textContent='WEEK '+getWeek();
+}
+
+// ─── CHARTS ───────────────────────────────────────────────────────────────────
+var currentChartKey = 'weight';
+var chartConfig = {
+  weight: { label:'Weight (lbs)', field:'weight', color:'#4a90d9', unit:'lbs' },
+  fat:    { label:'Body Fat %',   field:'fat',    color:'#e05c5c', unit:'%'   },
+  muscle: { label:'Muscle (lbs)', field:'muscle', color:'#3dd68c', unit:'lbs' },
+  bmi:    { label:'BMI',          field:'bmi',    color:'#e8b84b', unit:''    }
+};
+
+function switchChart(key, btn) {
+  currentChartKey = key;
+  document.querySelectorAll('.ctab').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('chartTitle').textContent = chartConfig[key].label;
+  drawChart(key);
+}
+
+function drawChart(key) {
+  var cfg = chartConfig[key];
+  var canvas = document.getElementById('progressChart');
+  var emptyEl = document.getElementById('chartEmpty');
+  var legendEl = document.getElementById('chartLegend');
+
+  // Get data points in chronological order
+  var logs = state.bodyLogs.slice().reverse();
+  var pts = logs.map(function(e){ return { date: e.date, val: parseFloat(e[cfg.field])||null }; })
+                .filter(function(p){ return p.val !== null; });
+
+  if(pts.length < 2) {
+    canvas.style.display = 'none';
+    emptyEl.style.display = 'block';
+    legendEl.innerHTML = '';
+    return;
+  }
+
+  canvas.style.display = 'block';
+  emptyEl.style.display = 'none';
+
+  var ctx = canvas.getContext('2d');
+  var W = canvas.offsetWidth || 360;
+  var H = 200;
+  canvas.width = W;
+  canvas.height = H;
+  ctx.clearRect(0, 0, W, H);
+
+  var vals = pts.map(function(p){ return p.val; });
+  var minV = Math.min.apply(null, vals);
+  var maxV = Math.max.apply(null, vals);
+  var range = maxV - minV || 1;
+  var pad = { top:20, right:20, bottom:30, left:44 };
+  var cW = W - pad.left - pad.right;
+  var cH = H - pad.top - pad.bottom;
+
+  // Grid lines
+  var gridCount = 4;
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  for(var g=0; g<=gridCount; g++){
+    var gy = pad.top + (cH/gridCount)*g;
+    ctx.beginPath(); ctx.moveTo(pad.left, gy); ctx.lineTo(pad.left+cW, gy); ctx.stroke();
+    var gVal = (maxV - (range/gridCount)*g).toFixed(1);
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.font = '600 9px Nunito, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(gVal, pad.left-6, gy+3);
+  }
+
+  // X axis labels
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.font = '700 9px Nunito, sans-serif';
+  ctx.textAlign = 'center';
+  var labelStep = Math.max(1, Math.floor(pts.length/4));
+  pts.forEach(function(p, i){
+    if(i % labelStep === 0 || i === pts.length-1){
+      var x = pad.left + (i/(pts.length-1||1))*cW;
+      var parts = p.date.split('/');
+      ctx.fillText((parts[0]||'')+'/'+( parts[1]||''), x, H-8);
+    }
+  });
+
+  // Gradient fill under line
+  var grad = ctx.createLinearGradient(0, pad.top, 0, pad.top+cH);
+  grad.addColorStop(0, cfg.color.replace(')', ',0.25)').replace('rgb','rgba').replace('#', 'rgba(').replace('rgba(','rgba(') );
+  // simpler approach
+  grad.addColorStop(0, hexToRgba(cfg.color, 0.25));
+  grad.addColorStop(1, hexToRgba(cfg.color, 0.0));
+  ctx.beginPath();
+  pts.forEach(function(p, i){
+    var x = pad.left + (i/(pts.length-1||1))*cW;
+    var y = pad.top + cH - ((p.val-minV)/range)*cH;
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  // close path for fill
+  ctx.lineTo(pad.left+cW, pad.top+cH);
+  ctx.lineTo(pad.left, pad.top+cH);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.strokeStyle = cfg.color;
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  pts.forEach(function(p, i){
+    var x = pad.left + (i/(pts.length-1||1))*cW;
+    var y = pad.top + cH - ((p.val-minV)/range)*cH;
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // Dots
+  pts.forEach(function(p, i){
+    var x = pad.left + (i/(pts.length-1||1))*cW;
+    var y = pad.top + cH - ((p.val-minV)/range)*cH;
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI*2);
+    ctx.fillStyle = cfg.color;
+    ctx.fill();
+    ctx.strokeStyle = '#1c2333';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+
+  // Legend: first, latest, change
+  var first = pts[0].val;
+  var last = pts[pts.length-1].val;
+  var diff = (last - first).toFixed(1);
+  var diffStr = (diff > 0 ? '+' : '') + diff + cfg.unit;
+  var diffColor = cfg.field === 'muscle' ? (diff >= 0 ? '#3dd68c' : '#e05c5c') : (diff <= 0 ? '#3dd68c' : '#e05c5c');
+  legendEl.innerHTML =
+    '<div class="cl-item"><div class="cl-val">'+first+' <span style="font-size:12px;">'+cfg.unit+'</span></div><div class="cl-lbl">Start</div></div>'
+   +'<div class="cl-item"><div class="cl-val">'+last+' <span style="font-size:12px;">'+cfg.unit+'</span></div><div class="cl-lbl">Current</div></div>'
+   +'<div class="cl-item"><div class="cl-val" style="color:'+diffColor+'">'+diffStr+'</div><div class="cl-lbl">Total Change</div></div>'
+   +'<div class="cl-item"><div class="cl-val">'+pts.length+'</div><div class="cl-lbl">Check-ins</div></div>';
+}
+
+function hexToRgba(hex, alpha) {
+  var r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return 'rgba('+r+','+g+','+b+','+alpha+')';
 }
 
 loadState();renderDayCards();renderBanner();updateHeader();
